@@ -1,0 +1,93 @@
+{
+  "name": "autonumtodo",
+  "displayName": "AutoNumTodo",
+  "description": "add number behind the TODO tag",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.97.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.insertTODO",
+        "title": "Insert Auto-numbered TODO"
+      },
+      {
+        "command": "extension.insertBUG",
+        "title": "Insert Auto-numbered BUG"
+      },
+      {
+        "command": "extension.insertFIX",
+        "title": "Insert Auto-numbered FIX"
+      },
+      {
+        "command": "extension.insertNOTE",
+        "title": "Insert Auto-numbered NOTE"
+      },
+      {
+        "command": "extension.insertREVIEW",
+        "title": "Insert Auto-numbered REVIEW"
+      },
+      {
+        "command": "extension.insertOPTIMISE",
+        "title": "Insert Auto-numbered OPTIMISE"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "extension.insertTODO",
+        "key": "cmd+shift+t",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.insertBUG",
+        "key": "cmd+shift+b",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.insertFIX",
+        "key": "cmd+shift+f",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.insertNOTE",
+        "key": "cmd+shift+n",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.insertREVIEW",
+        "key": "cmd+shift+r",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.insertOPTIMISE",
+        "key": "cmd+shift+o",
+        "when": "editorTextFocus"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.97.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@typescript-eslint/eslint-plugin": "^8.22.0",
+    "@typescript-eslint/parser": "^8.22.0",
+    "eslint": "^9.19.0",
+    "typescript": "^5.7.3",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1"
+  }
+}
