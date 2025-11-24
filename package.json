@@ -9,7 +9,14 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onCommand:extension.insertTODO",
+    "onCommand:extension.insertBUG",
+    "onCommand:extension.insertFIX",
+    "onCommand:extension.insertNOTE",
+    "onCommand:extension.insertREVIEW",
+    "onCommand:extension.insertOPTIMISE"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
