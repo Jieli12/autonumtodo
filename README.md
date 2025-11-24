@@ -16,10 +16,10 @@ This VSCode extension automatically numbers `TODO`, `BUG`, `FIX`, `NOTE`, `REVIE
 
 | File Type                                        | Comment Style      |
 | ------------------------------------------------ | ------------------ |
-| `.js`, `.ts`, `.java`, `.go`, `.cpp`, `.c`, `.h` | `// TODO-1:`       |
-| `.py`, `.r`, `.R`, `.txt`                        | `# TODO-1:`        |
-| `.m`, `.tex`                                     | `% TODO-1:`        |
-| `.md`                                            | `<!-- TODO-1: -->` |
+| `.js`, `.ts`, `.java`, `.go`, `.cpp`, `.c`, `.h` | `// TODO-7:`       |
+| `.py`, `.r`, `.R`, `.txt`                        | `# TODO-6:`        |
+| `.m`, `.tex`                                     | `% TODO-5:`        |
+| `.md`                                            | `<!-- TODO-4: -->` |
 
 ## Installation
 
