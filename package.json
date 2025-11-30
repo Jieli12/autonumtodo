@@ -2,7 +2,7 @@
   "name": "autonumtodo",
   "displayName": "AutoNumTodo",
   "description": "add number behind the TODO tag",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "Jieli12",
   "repository": {
     "type": "git",
@@ -15,7 +15,14 @@
     "Other"
   ],
   "activationEvents": [
-    "onStartupFinished"
+    "onCommand:extension.insertTODO",
+    "onCommand:extension.insertBUG",
+    "onCommand:extension.insertFIX",
+    "onCommand:extension.insertNOTE",
+    "onCommand:extension.insertREVIEW",
+    "onCommand:extension.insertOPTIMISE",
+    "onCommand:extension.renumberAllTags",
+    "onCommand:extension.removeAllTagNumbers"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -98,11 +105,6 @@
     "configuration": {
       "title": "AutoNumTodo",
       "properties": {
-        "autonumtodo.enableAutoNumberOnSave": {
-          "type": "boolean",
-          "default": true,
-          "description": "保存文件时自动给未编号的标签添加编号"
-        },
         "autonumtodo.excludePatterns": {
           "type": "array",
           "default": [

@@ -4,6 +4,18 @@ All notable changes to the "autonumtodo" extension will be documented in this fi
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.1.1] - 2025-11-30
+
+### Changed (Manual Trigger)
+
+- **编号触发方式**：移除保存时自动编号行为，现在仅在执行快捷键或命令时才会更新编号。
+- **激活事件**：扩展改为按命令激活，避免在启动时立即加载。
+- **文档更新**：README 新增“Renumber All Tags (Cmd+Shift+A)”批量编号提示，强调保存不会触发编号。
+
+### Removed (Manual Trigger)
+
+- `autonumtodo.enableAutoNumberOnSave` 配置项。
+
 ## [0.1.0] - 2025-11-24
 
 ### Added

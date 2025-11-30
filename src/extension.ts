@@ -121,24 +121,6 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	}
 
-	// 注册保存文件时的自动编号监听器
-	const saveListener = vscode.workspace.onDidSaveTextDocument(async (document) => {
-		const config = vscode.workspace.getConfiguration('autonumtodo');
-		const enableAutoNumberOnSave = config.get('enableAutoNumberOnSave', true);
-
-		if (!enableAutoNumberOnSave) {
-			return;
-		}
-
-		const fileExtension = path.extname(document.fileName).slice(1);
-		const supportedExtensions = ["js", "ts", "py", "md", "txt", "cpp", "c", "h", "r", "tex", "R", "java", "go", "m"];
-
-		if (supportedExtensions.includes(fileExtension)) {
-			await renumberTags(tags, document.uri);
-		}
-	});
-	context.subscriptions.push(saveListener);
-
 	// 注册全局重新编号命令
 	const renumberAllCommand = vscode.commands.registerCommand('extension.renumberAllTags', async () => {
 		await vscode.window.withProgress({
