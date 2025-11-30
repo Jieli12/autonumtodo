@@ -2,7 +2,7 @@
   "name": "autonumtodo",
   "displayName": "AutoNumTodo",
   "description": "add number behind the TODO tag",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "publisher": "Jieli12",
   "repository": {
     "type": "git",

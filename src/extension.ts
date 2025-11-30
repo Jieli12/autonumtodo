@@ -12,6 +12,15 @@ export function activate(context: vscode.ExtensionContext) {
 		"py": "#", "r": "#", "R": "#", "m": "%", "tex": "%", "md": "<!-- -->", "txt": "#"
 	};
 
+	const supportedExtensions = ["js", "ts", "py", "md", "txt", "cpp", "c", "h", "r", "tex", "java", "go", "m"];
+	const filePattern = "**/*.{js,ts,py,md,txt,cpp,c,h,r,tex,R,java,go,m}";
+
+	const isSupportedExtension = (extension: string) => supportedExtensions.includes(extension.toLowerCase());
+	const isSupportedDocument = (document: vscode.TextDocument) => {
+		const ext = path.extname(document.fileName).slice(1);
+		return isSupportedExtension(ext);
+	};
+
 	// 缓存：存储每个标签类型的最大编号
 	const tagNumberCache: { [key: string]: number } = {};
 	let cacheValid = false;
@@ -39,9 +48,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// 监听文件变化，使缓存失效
 	const fileWatcher = vscode.workspace.onDidChangeTextDocument((event) => {
-		const fileExtension = path.extname(event.document.fileName).slice(1);
-		const supportedExtensions = ["js", "ts", "py", "md", "txt", "cpp", "c", "h", "r", "tex", "R", "java", "go", "m"];
-		if (supportedExtensions.includes(fileExtension)) {
+		if (isSupportedDocument(event.document)) {
 			for (const change of event.contentChanges) {
 				const text = change.text;
 				if (tags.some(tag => text.includes(tag))) {
@@ -59,10 +66,10 @@ export function activate(context: vscode.ExtensionContext) {
 			return tagNumberCache[tag];
 		}
 
-		const filePattern = "**/*.{js,ts,py,md,txt,cpp,c,h,r,tex,R,java,go,m}";
 		const excludePattern = getExcludePattern();
 		const allFiles = await vscode.workspace.findFiles(filePattern, excludePattern);
 		let maxTagNumber = 0;
+		const scannedUris = new Set<string>();
 
 		for (const file of allFiles) {
 			const doc = await vscode.workspace.openTextDocument(file);
@@ -72,6 +79,24 @@ export function activate(context: vscode.ExtensionContext) {
 			while ((match = tagNumberedRegex.exec(text)) !== null) {
 				maxTagNumber = Math.max(maxTagNumber, parseInt(match[1], 10));
 			}
+			scannedUris.add(doc.uri.toString());
+		}
+
+		for (const doc of vscode.workspace.textDocuments) {
+			if (!isSupportedDocument(doc)) {
+				continue;
+			}
+			const key = doc.uri.toString();
+			if (!doc.isDirty && scannedUris.has(key)) {
+				continue;
+			}
+			const text = doc.getText();
+			const tagNumberedRegex = new RegExp(`${tag}-(\\d+):`, "g");
+			let match;
+			while ((match = tagNumberedRegex.exec(text)) !== null) {
+				maxTagNumber = Math.max(maxTagNumber, parseInt(match[1], 10));
+			}
+			scannedUris.add(key);
 		}
 
 		tagNumberCache[tag] = maxTagNumber;
@@ -86,21 +111,74 @@ export function activate(context: vscode.ExtensionContext) {
 		cacheValid = true;
 	}
 
+	async function getDocumentsToProcess(scopeUri?: vscode.Uri): Promise<vscode.TextDocument[]> {
+		const documents: vscode.TextDocument[] = [];
+		const seen = new Set<string>();
+		const openDocs = new Map<string, vscode.TextDocument>();
+
+		for (const doc of vscode.workspace.textDocuments) {
+			openDocs.set(doc.uri.toString(), doc);
+		}
+
+		const addDoc = (doc?: vscode.TextDocument) => {
+			if (!doc || !isSupportedDocument(doc)) {
+				return;
+			}
+			const key = doc.uri.toString();
+			if (seen.has(key)) {
+				return;
+			}
+			documents.push(doc);
+			seen.add(key);
+		};
+
+		if (scopeUri) {
+			addDoc(openDocs.get(scopeUri.toString()));
+			if (!seen.has(scopeUri.toString())) {
+				const scopeDoc = await vscode.workspace.openTextDocument(scopeUri);
+				addDoc(scopeDoc);
+			}
+		} else {
+			const excludePattern = getExcludePattern();
+			const files = await vscode.workspace.findFiles(filePattern, excludePattern);
+			for (const file of files) {
+				const key = file.toString();
+				const openDoc = openDocs.get(key);
+				if (openDoc) {
+					addDoc(openDoc);
+					continue;
+				}
+				const doc = await vscode.workspace.openTextDocument(file);
+				addDoc(doc);
+			}
+		}
+
+		for (const doc of vscode.workspace.textDocuments) {
+			if (!isSupportedDocument(doc)) {
+				continue;
+			}
+			if (scopeUri && doc.uri.toString() !== scopeUri.toString()) {
+				continue;
+			}
+			if (doc.isDirty || doc.isUntitled) {
+				addDoc(doc);
+			}
+		}
+
+		return documents;
+	}
+
 	// 辅助函数：对指定文件或工作区中的标签进行自动编号
 	async function renumberTags(tagsToRenumber: string[], scopeUri?: vscode.Uri) {
-		const filePattern = "**/*.{js,ts,py,md,txt,cpp,c,h,r,tex,R,java,go,m}";
-		const excludePattern = getExcludePattern();
-		const files = scopeUri
-			? [scopeUri]
-			: await vscode.workspace.findFiles(filePattern, excludePattern);
+		const documents = await getDocumentsToProcess(scopeUri);
+		if (documents.length === 0) {
+			return;
+		}
 
 		for (const tag of tagsToRenumber) {
-			// 使用缓存获取最大编号
 			let maxTagNumber = await getMaxTagNumber(tag);
 
-			// 给指定范围内的未编号标签赋值
-			for (const file of files) {
-				const doc = await vscode.workspace.openTextDocument(file);
+			for (const doc of documents) {
 				const text = doc.getText();
 				const tagUnnumberedRegex = new RegExp(`\\b${tag}:(?!\\d)`, "g");
 				let edit = new vscode.WorkspaceEdit();
@@ -114,7 +192,6 @@ export function activate(context: vscode.ExtensionContext) {
 				}
 				if (edit.size > 0) {
 					await vscode.workspace.applyEdit(edit);
-					// 更新缓存
 					tagNumberCache[tag] = maxTagNumber;
 				}
 			}
@@ -153,13 +230,10 @@ export function activate(context: vscode.ExtensionContext) {
 			title: "正在删除所有标签编号...",
 			cancellable: false
 		}, async (progress) => {
-			const filePattern = "**/*.{js,ts,py,md,txt,cpp,c,h,r,tex,R,java,go,m}";
-			const excludePattern = getExcludePattern();
-			const files = await vscode.workspace.findFiles(filePattern, excludePattern);
+			const documents = await getDocumentsToProcess();
 			let totalRemoved = 0;
 
-			for (const file of files) {
-				const doc = await vscode.workspace.openTextDocument(file);
+			for (const doc of documents) {
 				const text = doc.getText();
 				let edit = new vscode.WorkspaceEdit();
 				let hasChanges = false;
@@ -204,14 +278,9 @@ export function activate(context: vscode.ExtensionContext) {
 			// 使用缓存获取最大编号
 			let maxTagNumber = await getMaxTagNumber(tag);
 
-			// 获取工作区所有文件
-			const filePattern = "**/*.{js,ts,py,md,txt,cpp,c,h,r,tex,R,java,go,m}";
-			const excludePattern = getExcludePattern();
-			const files = await vscode.workspace.findFiles(filePattern, excludePattern);
+			const documents = await getDocumentsToProcess();
 
-			// 遍历所有文件，给无编号的标签赋值
-			for (const file of files) {
-				const doc = await vscode.workspace.openTextDocument(file);
+			for (const doc of documents) {
 				const text = doc.getText();
 				const tagUnnumberedRegex = new RegExp(`\\b${tag}:(?!\\d)`, "g");
 				let edit = new vscode.WorkspaceEdit();

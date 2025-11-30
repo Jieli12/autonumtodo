@@ -9,17 +9,17 @@ This VSCode extension numbers `TODO`, `BUG`, `FIX`, `NOTE`, `REVIEW`, and `OPTIM
 - Detects the highest existing tag number and increments it when you invoke a command.
 - Assigns numbers to unnumbered tags in the current file or entire workspace only when you explicitly trigger a command.
 - Uses correct comment syntax based on file extension.
-- Supports `TODO`, `BUG`, `FIX`, `NOTE`, `REVIEW`, and `OPTIMISE`.
+- Supports `TODO:`, `BUG:`, `FIX:`, `NOTE:`, `REVIEW:`, and `OPTIMISE:`.
 - Configurable keybindings for quick insertion.
 
 ## Supported File Types and Comment Styles
 
 | File Type                                        | Comment Style      |
 | ------------------------------------------------ | ------------------ |
-| `.js`, `.ts`, `.java`, `.go`, `.cpp`, `.c`, `.h` | `// TODO-7:`       |
-| `.py`, `.r`, `.R`, `.txt`                        | `# TODO-6:`        |
-| `.m`, `.tex`                                     | `% TODO-5:`        |
-| `.md`                                            | `<!-- TODO-4: -->` |
+| `.js`, `.ts`, `.java`, `.go`, `.cpp`, `.c`, `.h` | `// TODO-9:`       |
+| `.py`, `.r`, `.R`, `.txt`                        | `# TODO-8:`        |
+| `.m`, `.tex`                                     | `% TODO-7:`        |
+| `.md`                                            | `<!-- TODO-6: -->` |
 
 ## Installation
 
@@ -48,7 +48,7 @@ This VSCode extension numbers `TODO`, `BUG`, `FIX`, `NOTE`, `REVIEW`, and `OPTIM
   - `Cmd+Shift+R` → Insert `REVIEW`
   - `Cmd+Shift+O` → Insert `OPTIMISE`
 - To bulk re-number every supported tag type on demand, run **"Renumber All Tags in Workspace"** (`Cmd+Shift+A`).
-- To strip all tag numbers (turn `TODO-12:` back into `TODO-13:`), run **"Remove All Tag Numbers in Workspace"** (`Cmd+Shift+D`).
+- To strip all tag numbers (turn `TODO-5:` back into `TODO-4:`), run **"Remove All Tag Numbers in Workspace"** (`Cmd+Shift+D`).
 - 保存文件不会触发编号，只有在执行上述命令或快捷键时才会更新编号。
 
 ## Uninstallation

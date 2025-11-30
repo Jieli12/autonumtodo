@@ -4,6 +4,17 @@ All notable changes to the "autonumtodo" extension will be documented in this fi
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.1.2] - 2025-11-30
+
+### Fixed (Initial Workspace Run)
+
+- 第一次在新项目中运行 "Renumber All Tags" 现在会正确处理所有未编号标签（包括尚未保存的文件）。
+- 计算最大编号时会考虑未保存的更改，避免生成重复编号。
+
+### Changed (Workspace Consistency)
+
+- 删除编号命令现在会同时作用于所有打开且未保存的文件，确保工作区状态一致。
+
 ## [0.1.1] - 2025-11-30
 
 ### Changed (Manual Trigger)
